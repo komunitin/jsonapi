@@ -326,7 +326,28 @@ func unmarshalNode(data *Node, model reflect.Value, included *map[string]*Node) 
 				fieldValue.Set(m)
 
 			}
+		} else if annotation == annotationMeta {
+			metas := *data.Meta
+			// continue if no meta avaiable.
+			if len(metas) == 0 {
+				continue
+			}
 
+			meta := metas[args[1]]
+
+			// continue if the meta value was not included in the request
+			if meta == nil {
+				continue
+			}
+
+			structField := fieldType
+			value, err := unmarshalAttribute(meta, args, structField, fieldValue)
+			if err != nil {
+				er = err
+				break
+			}
+
+			assign(fieldValue, value)
 		} else {
 			er = fmt.Errorf(unsupportedStructTagMsg, annotation)
 		}
