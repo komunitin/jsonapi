@@ -448,6 +448,16 @@ func visitModelNode(model interface{}, included *map[string]*Node,
 				}
 			}
 
+		} else if annotation == annotationMeta {
+			if node.Meta == nil {
+				node.Meta = &Meta{}
+			}
+			strAttr, ok := fieldValue.Interface().(string)
+			if ok {
+				(*node.Meta)[args[1]] = strAttr
+			} else {
+				(*node.Meta)[args[1]] = fieldValue.Interface()
+			}
 		} else {
 			er = ErrBadJSONAPIStructTag
 			break

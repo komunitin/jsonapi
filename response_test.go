@@ -1023,3 +1023,19 @@ func testBlog() *Blog {
 		},
 	}
 }
+
+func TestMarshalMeta(t *testing.T) {
+	post := &PostWithMeta{
+		Post: Post{
+			ID:    1,
+			Title: "Title",
+			Body:  "Body",
+		},
+		MetaField: "meta!",
+	}
+	out := new(bytes.Buffer)
+	err := MarshalPayload(out, post)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

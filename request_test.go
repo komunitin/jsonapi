@@ -1416,3 +1416,28 @@ func TestUnmarshalNestedStructSlice(t *testing.T) {
 			out.Teams[0].Members[0].Firstname)
 	}
 }
+
+func TestUnmarshalMeta(t *testing.T) {
+	sample := map[string]interface{}{
+		"data": map[string]interface{}{
+			"type": "posts",
+			"id":   "1",
+			"attributes": map[string]interface{}{
+				"body":  "Hello",
+				"title": "World",
+			},
+			"meta": map[string]interface{}{
+				"metafield": "meta!",
+			},
+		},
+	}
+	data, _ := json.Marshal(sample)
+	post := new(PostWithMeta)
+	err := UnmarshalPayload(bytes.NewReader(data), post)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if post.MetaField != "meta!" {
+		t.Fatalf("Meta data not unmarshalled: expected `meta!` but got `%s`", post.MetaField)
+	}
+}

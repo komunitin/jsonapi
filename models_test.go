@@ -195,3 +195,8 @@ type CustomAttributeTypes struct {
 	Float  CustomFloatType  `jsonapi:"attr,float"`
 	String CustomStringType `jsonapi:"attr,string"`
 }
+
+type PostWithMeta struct {
+	Post
+	MetaField string `jsonapi:"meta,metafield"`
+}
