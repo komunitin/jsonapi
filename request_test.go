@@ -776,6 +776,9 @@ func TestUnmarshalManyPayload(t *testing.T) {
 				},
 			},
 		},
+		"links": map[string]interface{}{
+			"self": "http://example.com/posts",
+		},
 	}
 
 	data, err := json.Marshal(sample)
@@ -784,7 +787,7 @@ func TestUnmarshalManyPayload(t *testing.T) {
 	}
 	in := bytes.NewReader(data)
 
-	posts, err := UnmarshalManyPayload(in, reflect.TypeOf(new(Post)))
+	posts, extras, err := UnmarshalManyPayload(in, reflect.TypeOf(new(Post)))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -798,6 +801,14 @@ func TestUnmarshalManyPayload(t *testing.T) {
 		if !ok {
 			t.Fatal("Was expecting a Post")
 		}
+	}
+
+	if extras.Meta != nil {
+		t.Fatal("Was not expecting a meta object")
+	}
+
+	if (*extras.Links)["self"] != "http://example.com/posts" {
+		t.Fatal("Incorrect self link")
 	}
 }
 

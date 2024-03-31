@@ -70,24 +70,23 @@ func newErrUnsupportedPtrType(rf reflect.Value, t reflect.Type, structField refl
 // For example you could pass it, in, req.Body and, model, a BlogPost
 // struct instance to populate in an http handler,
 //
-//   func CreateBlog(w http.ResponseWriter, r *http.Request) {
-//   	blog := new(Blog)
+//	func CreateBlog(w http.ResponseWriter, r *http.Request) {
+//		blog := new(Blog)
 //
-//   	if err := jsonapi.UnmarshalPayload(r.Body, blog); err != nil {
-//   		http.Error(w, err.Error(), 500)
-//   		return
-//   	}
+//		if err := jsonapi.UnmarshalPayload(r.Body, blog); err != nil {
+//			http.Error(w, err.Error(), 500)
+//			return
+//		}
 //
-//   	// ...do stuff with your blog...
+//		// ...do stuff with your blog...
 //
-//   	w.Header().Set("Content-Type", jsonapi.MediaType)
-//   	w.WriteHeader(201)
+//		w.Header().Set("Content-Type", jsonapi.MediaType)
+//		w.WriteHeader(201)
 //
-//   	if err := jsonapi.MarshalPayload(w, blog); err != nil {
-//   		http.Error(w, err.Error(), 500)
-//   	}
-//   }
-//
+//		if err := jsonapi.MarshalPayload(w, blog); err != nil {
+//			http.Error(w, err.Error(), 500)
+//		}
+//	}
 //
 // Visit https://github.com/google/jsonapi#create for more info.
 //
@@ -113,15 +112,16 @@ func UnmarshalPayload(in io.Reader, model interface{}) error {
 
 // UnmarshalManyPayload converts an io into a set of struct instances using
 // jsonapi tags on the type's struct fields.
-func UnmarshalManyPayload(in io.Reader, t reflect.Type) ([]interface{}, error) {
+func UnmarshalManyPayload(in io.Reader, t reflect.Type) ([]interface{}, *PayloadExtras, error) {
 	payload := new(ManyPayload)
 
 	if err := json.NewDecoder(in).Decode(payload); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	models := []interface{}{}         // will be populated from the "data"
-	includedMap := map[string]*Node{} // will be populate from the "included"
+	includedMap := map[string]*Node{} // will be populated from the "included"
+	extras := new(PayloadExtras)      // will be populated from the "links" and "meta"
 
 	if payload.Included != nil {
 		for _, included := range payload.Included {
@@ -134,12 +134,15 @@ func UnmarshalManyPayload(in io.Reader, t reflect.Type) ([]interface{}, error) {
 		model := reflect.New(t.Elem())
 		err := unmarshalNode(data, model, &includedMap)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		models = append(models, model.Interface())
 	}
 
-	return models, nil
+	extras.Links = payload.Links
+	extras.Meta = payload.Meta
+
+	return models, extras, nil
 }
 
 func unmarshalNode(data *Node, model reflect.Value, included *map[string]*Node) (err error) {

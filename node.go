@@ -29,6 +29,11 @@ type ManyPayload struct {
 	Meta     *Meta   `json:"meta,omitempty"`
 }
 
+type PayloadExtras struct {
+	Links *Links
+	Meta  *Meta
+}
+
 func (p *ManyPayload) clearIncluded() {
 	p.Included = []*Node{}
 }
