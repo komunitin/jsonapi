@@ -351,6 +351,26 @@ func unmarshalNode(data *Node, model reflect.Value, included *map[string]*Node) 
 			}
 
 			assign(fieldValue, value)
+		} else if annotation == annotationLink {
+			links := *data.Links
+			// continue if no links avaiable.
+			if len(links) == 0 {
+				continue
+			}
+			link := links[args[1]]
+
+			if link == nil {
+				continue
+			}
+
+			structField := fieldType
+			value, err := unmarshalAttribute(link, args, structField, fieldValue)
+			if err != nil {
+				er = err
+				break
+			}
+
+			assign(fieldValue, value)
 		} else {
 			er = fmt.Errorf(unsupportedStructTagMsg, annotation)
 		}

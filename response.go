@@ -51,17 +51,16 @@ var (
 // Many Example: you could pass it, w, your http.ResponseWriter, and, models, a
 // slice of Blog struct instance pointers to be written to the response body:
 //
-//	 func ListBlogs(w http.ResponseWriter, r *http.Request) {
-//     blogs := []*Blog{}
+//		 func ListBlogs(w http.ResponseWriter, r *http.Request) {
+//	    blogs := []*Blog{}
 //
-//		 w.Header().Set("Content-Type", jsonapi.MediaType)
-//		 w.WriteHeader(http.StatusOK)
+//			 w.Header().Set("Content-Type", jsonapi.MediaType)
+//			 w.WriteHeader(http.StatusOK)
 //
-//		 if err := jsonapi.MarshalPayload(w, blogs); err != nil {
-//			 http.Error(w, err.Error(), http.StatusInternalServerError)
+//			 if err := jsonapi.MarshalPayload(w, blogs); err != nil {
+//				 http.Error(w, err.Error(), http.StatusInternalServerError)
+//			 }
 //		 }
-//	 }
-//
 func MarshalPayload(w io.Writer, models interface{}) error {
 	payload, err := Marshal(models)
 	if err != nil {
@@ -457,6 +456,16 @@ func visitModelNode(model interface{}, included *map[string]*Node,
 				(*node.Meta)[args[1]] = strAttr
 			} else {
 				(*node.Meta)[args[1]] = fieldValue.Interface()
+			}
+		} else if annotation == annotationLink {
+			if node.Links == nil {
+				node.Links = &Links{}
+			}
+			strAttr, ok := fieldValue.Interface().(string)
+			if ok {
+				(*node.Links)[args[1]] = strAttr
+			} else {
+				(*node.Links)[args[1]] = fieldValue.Interface()
 			}
 		} else {
 			er = ErrBadJSONAPIStructTag

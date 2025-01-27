@@ -200,3 +200,8 @@ type PostWithMeta struct {
 	Post
 	MetaField string `jsonapi:"meta,metafield"`
 }
+
+type PostWithLink struct {
+	Post
+	SelfLink string `jsonapi:"link,self"`
+}

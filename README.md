@@ -8,7 +8,10 @@
 A serializer/deserializer for JSON payloads that comply to the
 [JSON API - jsonapi.org](http://jsonapi.org) spec in go.
 
-
+## This fork
+This is a fork of the original [google/jsonapi](https://github.com/google/jsonapi) repository. Additional features:
+- Support for `meta` and `link` annotation for resources
+- Support for getting response links.
 
 ## Installation
 

@@ -1452,3 +1452,28 @@ func TestUnmarshalMeta(t *testing.T) {
 		t.Fatalf("Meta data not unmarshalled: expected `meta!` but got `%s`", post.MetaField)
 	}
 }
+
+func TestUnmarshalLink(t *testing.T) {
+	sample := map[string]interface{}{
+		"data": map[string]interface{}{
+			"type": "posts",
+			"id":   "1",
+			"attributes": map[string]interface{}{
+				"body":  "Hello",
+				"title": "World",
+			},
+			"links": map[string]interface{}{
+				"self": "http://example.com/posts/1",
+			},
+		},
+	}
+	data, _ := json.Marshal(sample)
+	post := new(PostWithLink)
+	err := UnmarshalPayload(bytes.NewReader(data), post)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if post.SelfLink != "http://example.com/posts/1" {
+		t.Fatalf("Link data not unmarshalled: expected `http://example.com/posts/1` but got `%s`", post.SelfLink)
+	}
+}
