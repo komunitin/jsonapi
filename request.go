@@ -330,8 +330,11 @@ func unmarshalNode(data *Node, model reflect.Value, included *map[string]*Node) 
 
 			}
 		} else if annotation == annotationMeta {
-			metas := *data.Meta
 			// continue if no meta avaiable.
+			if data.Meta == nil {
+				continue
+			}
+			metas := *data.Meta
 			if len(metas) == 0 {
 				continue
 			}
@@ -352,8 +355,11 @@ func unmarshalNode(data *Node, model reflect.Value, included *map[string]*Node) 
 
 			assign(fieldValue, value)
 		} else if annotation == annotationLink {
-			links := *data.Links
 			// continue if no links avaiable.
+			if data.Links == nil {
+				continue
+			}
+			links := *data.Links
 			if len(links) == 0 {
 				continue
 			}
